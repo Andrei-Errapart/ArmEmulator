@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEmulator", "TestEmulator.vcxproj", "{537B89BD-AB52-4F2E-A797-759FFF0943CD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{537B89BD-AB52-4F2E-A797-759FFF0943CD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{537B89BD-AB52-4F2E-A797-759FFF0943CD}.Debug|Win32.Build.0 = Debug|Win32
+		{537B89BD-AB52-4F2E-A797-759FFF0943CD}.Release|Win32.ActiveCfg = Release|Win32
+		{537B89BD-AB52-4F2E-A797-759FFF0943CD}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
