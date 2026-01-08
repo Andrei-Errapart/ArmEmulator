@@ -1,5 +1,7 @@
 # ArmEmulator
 
+[![CI](https://github.com/Andrei-Errapart/ArmEmulator/actions/workflows/ci.yml/badge.svg)](https://github.com/Andrei-Errapart/ArmEmulator/actions/workflows/ci.yml)
+
 A Cortex-M0 emulator implementing the Thumb-2 instruction set, intended for use with the NXP LPC1114 microcontroller.
 
 ## Quickstart
