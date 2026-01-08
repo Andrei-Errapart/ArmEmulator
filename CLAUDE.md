@@ -13,6 +13,7 @@ ARM Cortex-M0 emulator implementing the Thumb-2 instruction set, specifically de
 make          # Build test executable
 make test     # Build and run tests
 make lib      # Build libarm_emulator.a static library
+make examples # Build example programs
 make clean    # Remove build artifacts
 ```
 
@@ -27,10 +28,11 @@ make clean    # Remove build artifacts
 ```
 src/           Core emulator library
 tests/         Test harness
+examples/      Usage examples
 vs/            Visual Studio project files
 ```
 
-**Build artifacts (gitignored):** `*.o`, `*.a`, `test_emulator`
+**Build artifacts (gitignored):** `*.o`, `*.a`, `test_emulator`, `examples/*` (binaries)
 
 ### Core Components
 

@@ -394,7 +394,16 @@ arm_emulator_read_memory(
 	const uint32_t	service_offset = Address - self->service_address;
 	if (program_offset < self->program_size)
 	{
-		return arm_emulator_callback_read_program_memory(Buffer, Address, Count);
+		if (program_offset + Count <= self->program_size)
+		{
+			memcpy(Buffer, (const uint8_t*)(self->program + program_offset), Count);
+			return 0;
+		}
+		else
+		{
+			uart_write_hex32("arm_emulator_read_memory: Program memory size exceeded when reading from address 0x", Address);
+			uart_write_crlf();
+		}
 	}
 	else if (data_offset < self->data_size)
 	{
@@ -424,8 +433,8 @@ arm_emulator_read_memory(
 	}
 	else
 	{
-		uart_write_hex32("arm_emulator_read_memory: fetch from invalid address 0x", Address);
-		uart_write_crlf();
+		/* Address outside all defined regions - try callback */
+		return arm_emulator_callback_read_program_memory(Buffer, Address, Count);
 	}
 	return -1;
 }
@@ -775,7 +784,7 @@ arm_emulator_execute(
 	for (instruction_count=0; instruction_count<max_number_of_instructions; ++instruction_count)
 	{
 		uint16_t		instruction;
-		if (arm_emulator_callback_read_program_memory((uint8_t*)(&instruction), PC, 2)==0)
+		if (arm_emulator_read_memory((uint8_t*)(&instruction), PC, 2)==0)
 		{
 			const uint32_t	prev_pc = PC;
 			// Little-Endian?

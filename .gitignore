@@ -6,6 +6,10 @@
 
 # Executables
 test_emulator
+examples/basic
+examples/callbacks
+examples/debug
+examples/lpc1114
 
 # macOS
 .DS_Store
