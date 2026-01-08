@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <assert.h>	// programmer's best friend.
 #include <stdint.h>	// int8_t
 #include <stdio.h>	// printf

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #ifndef comm_h_
 #define comm_h_
 

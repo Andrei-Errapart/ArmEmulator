@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** An Cortex-M0 emulator. Intended for use in LPC1114.
 */
 #ifndef arm_emulator_h_

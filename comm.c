@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #ifdef __USE_CMSIS
 #include "LPC11xx.h"
 #endif

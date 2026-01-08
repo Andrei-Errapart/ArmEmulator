@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <stdlib.h>		// srand
 #include <stdio.h>
 #include <time.h>		// time

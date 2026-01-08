@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** \file Implementation of the emulator. */
 #include "arm_emulator.h"
 #include <string.h>	// memset

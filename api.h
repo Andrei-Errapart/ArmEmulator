@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** \file API for plugin and the services. */
 #ifndef plugin_api_h_
 #define plugin_api_h_
