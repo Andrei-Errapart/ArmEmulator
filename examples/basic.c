@@ -12,35 +12,40 @@
 #include <string.h>
 #include "arm_emulator.h"
 
+/* Emulator state */
+static struct arm_emulator_state emu;
+
 /* Memory regions */
 static uint8_t program_memory[1024];
 static uint8_t data_memory[256];
 
 /* Required callback: handle external function calls */
 int arm_emulator_callback_functioncall(
-    const uint32_t FunctionAddress,
-    ARM_EMULATOR_STATE* State)
+    struct arm_emulator_state *state,
+    uint32_t function_address)
 {
-    (void)State;
-    printf("Function call to 0x%08X\n", FunctionAddress);
+    (void)state;
+    printf("Function call to 0x%08X\n", function_address);
     return -1;  /* Not handled */
 }
 
 /* Callback for reads outside defined memory regions (not needed for basic use) */
 int arm_emulator_callback_read_program_memory(
-    uint8_t* Buffer,
-    const uint32_t Address,
-    const uint8_t Count)
+    struct arm_emulator_state *state,
+    uint8_t *buffer,
+    uint32_t address,
+    size_t count)
 {
-    (void)Buffer;
-    (void)Address;
-    (void)Count;
+    (void)state;
+    (void)buffer;
+    (void)address;
+    (void)count;
     return -1;  /* No extended memory */
 }
 
 int main(void)
 {
-    ARM_EMULATOR_RETURN_VALUE result;
+    enum arm_emulator_result result;
 
     /*
      * Simple program that computes 5 + 3:
@@ -61,19 +66,20 @@ int main(void)
 
     /* Initialize emulator */
     arm_emulator_reset(
+        &emu,
         program_memory, 0x6000, sizeof(program_memory),
         data_memory, 0x10000000, sizeof(data_memory),
         NULL, 0, 0  /* No service memory */
     );
 
     /* Start execution at address 0x6000 (with Thumb bit set = 0x6001) */
-    arm_emulator_start_function_call((void*)0x6001, NULL, 0);
+    arm_emulator_start_function_call(&emu, (void *)0x6001, NULL, 0);
 
     /* Execute up to 100 instructions */
-    result = arm_emulator_execute(100);
+    result = arm_emulator_execute(&emu, 100);
 
     if (result == ARM_EMULATOR_FUNCTION_RETURNED) {
-        uint32_t retval = arm_emulator_get_function_return_value();
+        uint32_t retval = arm_emulator_get_function_return_value(&emu);
         printf("Function returned: %u (expected: 8)\n", retval);
     } else {
         printf("Execution error: %d\n", result);

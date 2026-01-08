@@ -11,7 +11,7 @@ main(
 	int		argc,
 	char**	argv)
 {
-	const testcase_t*	testcase;
+	const struct testcase *testcase;
 	(void)argc;
 	(void)argv;
 

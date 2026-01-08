@@ -18,7 +18,7 @@
 #include <stdlib.h>	// atoi
 
 #include "comm.h"
-#include "api.h" // use some functions from them, too.
+#include "plugin_api.h" // use some functions from them, too.
 
 #if defined(_MSC_VER) || defined(DESKTOP_BUILD)
 void UARTSend(const uint8_t *BufferPtr, uint32_t Length)

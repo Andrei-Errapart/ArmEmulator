@@ -11,6 +11,9 @@
 #include <string.h>
 #include "arm_emulator.h"
 
+/* Emulator state */
+static struct arm_emulator_state emu;
+
 /* Memory regions */
 static uint8_t program_memory[1024];
 static uint8_t data_memory[256];
@@ -29,31 +32,31 @@ static int call_count = 0;
  * this callback is invoked.
  */
 int arm_emulator_callback_functioncall(
-    const uint32_t FunctionAddress,
-    ARM_EMULATOR_STATE* State)
+    struct arm_emulator_state *state,
+    uint32_t function_address)
 {
     /* Mask off Thumb bit for address comparison */
-    uint32_t addr = FunctionAddress & ~1;
+    uint32_t addr = function_address & ~1;
 
     call_count++;
-    printf("Callback #%d: Function call to 0x%08X\n", call_count, FunctionAddress);
+    printf("Callback #%d: Function call to 0x%08X\n", call_count, function_address);
 
     /* Example: Intercept call to address 0x100 (simulated "print" function) */
     if (addr == 0x100) {
         /* R0 contains the value to "print" */
-        printf("  -> Simulated print: value = %u\n", State->R[0]);
+        printf("  -> Simulated print: value = %u\n", state->R[0]);
         /* Set return value in R0 */
-        State->R[0] = 0;  /* Success */
+        state->R[0] = 0;  /* Success */
         return 0;  /* Function handled */
     }
 
     /* Example: Intercept call to address 0x104 (simulated "add" function) */
     if (addr == 0x104) {
         /* R0 and R1 contain operands */
-        uint32_t a = State->R[0];
-        uint32_t b = State->R[1];
+        uint32_t a = state->R[0];
+        uint32_t b = state->R[1];
         printf("  -> Simulated add: %u + %u = %u\n", a, b, a + b);
-        State->R[0] = a + b;
+        state->R[0] = a + b;
         return 0;  /* Function handled */
     }
 
@@ -65,29 +68,32 @@ int arm_emulator_callback_functioncall(
  * Also demonstrates serving external ROM at a different address.
  */
 int arm_emulator_callback_read_program_memory(
-    uint8_t* Buffer,
-    const uint32_t Address,
-    const uint8_t Count)
+    struct arm_emulator_state *state,
+    uint8_t *buffer,
+    uint32_t address,
+    size_t count)
 {
+    (void)state;
+
     /* Read from main program memory at 0x6000 */
-    if (Address >= 0x6000 && Address + Count <= 0x6000 + sizeof(program_memory)) {
-        memcpy(Buffer, &program_memory[Address - 0x6000], Count);
+    if (address >= 0x6000 && address + count <= 0x6000 + sizeof(program_memory)) {
+        memcpy(buffer, &program_memory[address - 0x6000], count);
         return 0;
     }
 
     /* Serve reads from external ROM at 0x8000 */
-    if (Address >= 0x8000 && Address + Count <= 0x8000 + sizeof(external_rom)) {
-        memcpy(Buffer, &external_rom[Address - 0x8000], Count);
+    if (address >= 0x8000 && address + count <= 0x8000 + sizeof(external_rom)) {
+        memcpy(buffer, &external_rom[address - 0x8000], count);
         return 0;
     }
 
-    memset(Buffer, 0, Count);
+    memset(buffer, 0, count);
     return -1;  /* Address not mapped */
 }
 
 int main(void)
 {
-    ARM_EMULATOR_RETURN_VALUE result;
+    enum arm_emulator_result result;
 
     /*
      * Program that calls external functions.
@@ -114,18 +120,19 @@ int main(void)
     memcpy(program_memory, code, sizeof(code));
 
     arm_emulator_reset(
+        &emu,
         program_memory, 0x6000, sizeof(program_memory),
         data_memory, 0x10000000, sizeof(data_memory),
         NULL, 0, 0
     );
 
-    arm_emulator_start_function_call((void*)0x6001, NULL, 0);
+    arm_emulator_start_function_call(&emu, (void *)0x6001, NULL, 0);
 
     printf("Executing with callbacks...\n\n");
-    result = arm_emulator_execute(100);
+    result = arm_emulator_execute(&emu, 100);
 
     if (result == ARM_EMULATOR_FUNCTION_RETURNED) {
-        printf("\nFunction returned: %u\n", arm_emulator_get_function_return_value());
+        printf("\nFunction returned: %u\n", arm_emulator_get_function_return_value(&emu));
         printf("Total callbacks: %d\n", call_count);
     } else {
         printf("Execution error: %d\n", result);

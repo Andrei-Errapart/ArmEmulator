@@ -19,11 +19,13 @@ make clean    # Remove build artifacts
 ```c
 #include "arm_emulator.h"
 
+struct arm_emulator_state emu;
 uint8_t program_memory[4096];
 uint8_t data_memory[1024];
 
 /* Initialize with memory regions */
 arm_emulator_reset(
+    &emu,
     program_memory, 0x6000, sizeof(program_memory),  /* Program */
     data_memory, 0x10000000, sizeof(data_memory),    /* Data */
     NULL, 0, 0                                        /* Service (optional) */
@@ -34,13 +36,13 @@ arm_emulator_reset(
 
 ```c
 /* Start execution at address (with Thumb bit set) */
-arm_emulator_start_function_call((void*)0x6001, NULL, 0);
+arm_emulator_start_function_call(&emu, (void *)0x6001, NULL, 0);
 
 /* Execute up to N instructions */
-ARM_EMULATOR_RETURN_VALUE result = arm_emulator_execute(100);
+enum arm_emulator_result result = arm_emulator_execute(&emu, 100);
 
 if (result == ARM_EMULATOR_FUNCTION_RETURNED) {
-    uint32_t retval = arm_emulator_get_function_return_value();
+    uint32_t retval = arm_emulator_get_function_return_value(&emu);
 }
 ```
 
@@ -51,8 +53,8 @@ You must implement these callbacks:
 ```c
 /* Called when code calls an external function */
 int arm_emulator_callback_functioncall(
-    const uint32_t FunctionAddress,
-    ARM_EMULATOR_STATE* State)
+    struct arm_emulator_state *state,
+    uint32_t function_address)
 {
     /* Return 0 if handled, -1 otherwise */
     return -1;
@@ -60,9 +62,10 @@ int arm_emulator_callback_functioncall(
 
 /* Called to read from addresses outside defined memory regions */
 int arm_emulator_callback_read_program_memory(
-    uint8_t* Buffer,
-    const uint32_t Address,
-    const uint8_t Count)
+    struct arm_emulator_state *state,
+    uint8_t *buffer,
+    uint32_t address,
+    size_t count)
 {
     /* Not needed for basic use - emulator reads from internal buffer */
     return -1;

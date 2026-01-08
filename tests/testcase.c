@@ -56,14 +56,14 @@
 #define TESTCASE_BRANCH(scond, cond, offset, flags, takes_jump) \
 	{ "b" scond " +#" #offset, INSTR_4_cond_imm8(0xD, (cond), offset/2), \
 	{ {INDEX_APSR, flags }, REG_END }, NO_MEMORY, \
-	{ {INDEX_PC, DEFAULT_PC+(takes_jump ? 4 + offset : 2) }, REG_END }, NO_MEMORY }
+	{ {INDEX_PC, TESTCASE_DEFAULT_PC+(takes_jump ? 4 + offset : 2) }, REG_END }, NO_MEMORY }
 
 #define	TESTCASE_BRANCH_AND_LINK(offset) \
 	{ "b +#" #offset, INSTR_BL_imm24((offset/2)), \
 	NO_REGISTERS, NO_MEMORY, \
-	{ {INDEX_PC, DEFAULT_PC+4 + offset }, { INDEX_LR, (DEFAULT_PC + 4) | 1}, REG_END}, NO_MEMORY }
+	{ {INDEX_PC, TESTCASE_DEFAULT_PC+4 + offset }, { INDEX_LR, (TESTCASE_DEFAULT_PC + 4) | 1}, REG_END}, NO_MEMORY }
 
-const testcase_t	testcases[] =
+const struct testcase testcases[] =
 {
 	// name							I16.0	I16.1	R.BEFORE
 /* ADC */
@@ -104,12 +104,12 @@ const testcase_t	testcases[] =
 	{ {INDEX_SP, 0x10000}, REG_END}, NO_MEMORY },
 /* ADR */
 	{ "adr r6, #540; default_pc + 0", INSTR_5_Rdn_imm8(0x14, 6, 540/4),
-	{ { INDEX_PC, DEFAULT_PC }, REG_END }, NO_MEMORY,
-	{ { 6, DEFAULT_PC + 4 + 540 }, REG_END }, NO_MEMORY },
+	{ { INDEX_PC, TESTCASE_DEFAULT_PC }, REG_END }, NO_MEMORY,
+	{ { 6, TESTCASE_DEFAULT_PC + 4 + 540 }, REG_END }, NO_MEMORY },
 /* ADR - aligned */
 	{ "adr r6, #540 ; default_pc+2 ", INSTR_5_Rdn_imm8(0x14, 6, 540/4),
-	{ { INDEX_PC, DEFAULT_PC + 2 }, REG_END }, NO_MEMORY,
-	{ { 6, DEFAULT_PC + 4 + 540 }, REG_END }, NO_MEMORY },
+	{ { INDEX_PC, TESTCASE_DEFAULT_PC + 2 }, REG_END }, NO_MEMORY,
+	{ { 6, TESTCASE_DEFAULT_PC + 4 + 540 }, REG_END }, NO_MEMORY },
 /* AND (register) */
 	{ "and r5, r4; PSR=NZCV", INSTR_10_Rm_Rdn(0x100, 4, 5),
 	{ { 4, 0xFFFF3333 }, { 5, 0x4444FFFF }, { INDEX_APSR, FLAG_N|FLAG_Z|FLAG_C|FLAG_V}, REG_END}, NO_MEMORY,
@@ -144,11 +144,11 @@ const testcase_t	testcases[] =
 /* B: Encoding T2 */
 	{ "b #2020", INSTR_5_imm11(0x1C, 2020/2),
 	NO_REGISTERS, NO_MEMORY, \
-	{ {INDEX_PC, DEFAULT_PC + 4 + 2020 }, REG_END }, NO_MEMORY },
+	{ {INDEX_PC, TESTCASE_DEFAULT_PC + 4 + 2020 }, REG_END }, NO_MEMORY },
 /* B: Encoding T2 */
 	{ "b #-2048", INSTR_5_imm11(0x1C, -2048/2),
 	NO_REGISTERS, NO_MEMORY, \
-	{ {INDEX_PC, DEFAULT_PC + 4 - 2048 }, REG_END }, NO_MEMORY },
+	{ {INDEX_PC, TESTCASE_DEFAULT_PC + 4 - 2048 }, REG_END }, NO_MEMORY },
 /* BIC (register) */
 	{ "bic r1, r0", INSTR_10_Rm_Rdn(0x10E, 0, 1),
 	{ {1, 0xFFFF}, {0, 0x8421}, {INDEX_APSR, FLAG_C|FLAG_Z|FLAG_N}, REG_END }, NO_MEMORY,
@@ -162,11 +162,11 @@ const testcase_t	testcases[] =
 	{ {INDEX_PC, 0x701c}, { INDEX_LR, (0x7124 + 4) | 1}, REG_END}, NO_MEMORY },
 /* BLX (register) */
 	{ "blx r11", INSTR_9_RRm_000(0x08F, 11),
-	{ {INDEX_PC, DEFAULT_PC}, {11, 0x7348}, REG_END}, NO_MEMORY,
-	{ {INDEX_PC, 0x7348}, {INDEX_LR, (DEFAULT_PC+2) | 1}, REG_END}, NO_MEMORY},
+	{ {INDEX_PC, TESTCASE_DEFAULT_PC}, {11, 0x7348}, REG_END}, NO_MEMORY,
+	{ {INDEX_PC, 0x7348}, {INDEX_LR, (TESTCASE_DEFAULT_PC+2) | 1}, REG_END}, NO_MEMORY},
 /* BX (register) */
 	{ "bx r11", INSTR_9_RRm_000(0x08E, 11),
-	{ {INDEX_PC, DEFAULT_PC}, {11, 0x7348}, REG_END}, NO_MEMORY,
+	{ {INDEX_PC, TESTCASE_DEFAULT_PC}, {11, 0x7348}, REG_END}, NO_MEMORY,
 	{ {INDEX_PC, 0x7348}, REG_END}, NO_MEMORY},
 /* CMN (register) */
 	{ "cmn r0, r1", INSTR_10_Rm_Rn(0x10B, 1, 0), 
@@ -199,15 +199,15 @@ const testcase_t	testcases[] =
 /* ISB: not implemented. */
 /* LDM */
 	{ "ldm r6!, {r7, r0}", INSTR_5_Rn_imm8(0x19, 6, ((1<<7)|(1<<0))),
-	{ {6, PLUGIN_DATA_ADDRESS}, REG_END}, { 8, PLUGIN_DATA_ADDRESS, "\x04\x03\x03\x02\x08\x07\x06\x05"},
-	{ {6, PLUGIN_DATA_ADDRESS+8}, {0, 0x02030304}, {7, 0x05060708}, REG_END}, NO_MEMORY},
+	{ {6, TESTCASE_PLUGIN_DATA_ADDRESS}, REG_END}, { 8, TESTCASE_PLUGIN_DATA_ADDRESS, "\x04\x03\x03\x02\x08\x07\x06\x05"},
+	{ {6, TESTCASE_PLUGIN_DATA_ADDRESS+8}, {0, 0x02030304}, {7, 0x05060708}, REG_END}, NO_MEMORY},
 /* LDR (immediate): Encoding T1. */
 	{ "ldr r4, r0, #16", INSTR_5_imm5_Rn_Rt(0x0D, 4, 0, 4),
-	{ { 0, PLUGIN_API_ADDRESS+100}, REG_END}, { 4, PLUGIN_API_ADDRESS+100+16, "\xFF\x55\xFF\x11"},
+	{ { 0, TESTCASE_PLUGIN_API_ADDRESS+100}, REG_END}, { 4, TESTCASE_PLUGIN_API_ADDRESS+100+16, "\xFF\x55\xFF\x11"},
 	{ { 4, 0x11FF55FF}, REG_END}, NO_MEMORY},
 /* LDR (immediate): Encoding T2. */
 	{ "ldr r7, sp, +#1000", INSTR_5_Rt_imm8(0x13, 7, 1000/4),
-	{ { INDEX_SP, PLUGIN_DATA_ADDRESS}, REG_END}, { 4, PLUGIN_DATA_ADDRESS+1000, "\x67\x45\x23\x01"},
+	{ { INDEX_SP, TESTCASE_PLUGIN_DATA_ADDRESS}, REG_END}, { 4, TESTCASE_PLUGIN_DATA_ADDRESS+1000, "\x67\x45\x23\x01"},
 	{ { 7, 0x01234567 }, REG_END}, NO_MEMORY},
 /* LDR (literal) */
 	{ "ldr r3,  +#28", INSTR_5_Rt_imm8(0x09, 3, 28/4),
@@ -219,39 +219,39 @@ const testcase_t	testcases[] =
 	{ {3, 0x12345678}, REG_END}, NO_MEMORY},
 /* LDR (register) */
 	{ "ldr r3, r4, r5", INSTR_7_Rm_Rn_Rt(0x2C, 5, 4, 3),
-	{ {4, PLUGIN_DATA_ADDRESS}, {5, 100}, REG_END}, {4, PLUGIN_DATA_ADDRESS+100, "\xFF\x00\xFF\x00"},
+	{ {4, TESTCASE_PLUGIN_DATA_ADDRESS}, {5, 100}, REG_END}, {4, TESTCASE_PLUGIN_DATA_ADDRESS+100, "\xFF\x00\xFF\x00"},
 	{ {3, 0x00FF00FF}, REG_END}, NO_MEMORY},
 /* LDRB (immediate) */
 	{ "ldrb r1, r0, +#30", INSTR_5_imm5_Rn_Rt(0x0F, 30, 0, 1),
-	{ {0, PLUGIN_DATA_ADDRESS}, REG_END}, {1, PLUGIN_DATA_ADDRESS+30, "\x33"},
+	{ {0, TESTCASE_PLUGIN_DATA_ADDRESS}, REG_END}, {1, TESTCASE_PLUGIN_DATA_ADDRESS+30, "\x33"},
 	{ {1, 0x33}, REG_END}, NO_MEMORY},
 /* LDRB (register) */
 	{ "ldrb r7, r6, r5", INSTR_7_Rm_Rn_Rt(0x2E, 5, 6, 7),
-	{ {6, 100}, {5, PLUGIN_DATA_ADDRESS}, REG_END}, {1, PLUGIN_DATA_ADDRESS+100, "\x33"},
+	{ {6, 100}, {5, TESTCASE_PLUGIN_DATA_ADDRESS}, REG_END}, {1, TESTCASE_PLUGIN_DATA_ADDRESS+100, "\x33"},
 	{ {7, 0x33}, REG_END}, NO_MEMORY},
 /* LDRH (immediate) */
 	{ "ldrh r5, r4, +#60", INSTR_5_imm5_Rn_Rt(0x11, 60/2, 4, 5),
-	{ {4, PLUGIN_DATA_ADDRESS}, REG_END}, {2, PLUGIN_DATA_ADDRESS+60, "\x44\x33"},
+	{ {4, TESTCASE_PLUGIN_DATA_ADDRESS}, REG_END}, {2, TESTCASE_PLUGIN_DATA_ADDRESS+60, "\x44\x33"},
 	{ {5, 0x3344}, REG_END}, NO_MEMORY},
 /* LDRH (register) */
 	{ "ldrh r4, r3, r2", INSTR_7_Rm_Rn_Rt(0x2D, 2, 3, 4),
-	{ {3, PLUGIN_DATA_ADDRESS}, {2, 50}, REG_END}, {2, PLUGIN_DATA_ADDRESS+50, "\x33\x44"},
+	{ {3, TESTCASE_PLUGIN_DATA_ADDRESS}, {2, 50}, REG_END}, {2, TESTCASE_PLUGIN_DATA_ADDRESS+50, "\x33\x44"},
 	{ {4, 0x4433}, REG_END}, NO_MEMORY},
 /* LDRSB (register) */
 	{ "ldrsb r2, r1, r0", INSTR_7_Rm_Rn_Rt(0x2B, 0, 1, 2),
-	{ {1, 200}, {0, PLUGIN_DATA_ADDRESS}, REG_END}, {1, PLUGIN_DATA_ADDRESS+200, "\x11"},
+	{ {1, 200}, {0, TESTCASE_PLUGIN_DATA_ADDRESS}, REG_END}, {1, TESTCASE_PLUGIN_DATA_ADDRESS+200, "\x11"},
 	{ {2, 0x11}, REG_END}, NO_MEMORY},
 /* LDRSB (register) */
 	{ "ldrsb r0, r7, r6", INSTR_7_Rm_Rn_Rt(0x2B, 6, 7, 0),
-	{ {7, 200}, {6, PLUGIN_DATA_ADDRESS}, REG_END}, {1, PLUGIN_DATA_ADDRESS+200, "\x81"},
+	{ {7, 200}, {6, TESTCASE_PLUGIN_DATA_ADDRESS}, REG_END}, {1, TESTCASE_PLUGIN_DATA_ADDRESS+200, "\x81"},
 	{ {0, 0xFFFFFF81}, REG_END}, NO_MEMORY},
 /* LDRSH (register) */
 	{ "ldrsh r7, r6, r5", INSTR_7_Rm_Rn_Rt(0x2F, 5, 6, 7),
-	{ {6, PLUGIN_API_ADDRESS}, {5, 400}, REG_END}, {2, PLUGIN_API_ADDRESS+400, "\x11\x22"},
+	{ {6, TESTCASE_PLUGIN_API_ADDRESS}, {5, 400}, REG_END}, {2, TESTCASE_PLUGIN_API_ADDRESS+400, "\x11\x22"},
 	{ {7, 0x2211}, REG_END}, NO_MEMORY},
 /* LDRSH (register) */
 	{ "ldrsh r7, r6, r5", INSTR_7_Rm_Rn_Rt(0x2F, 5, 6, 7),
-	{ {6, PLUGIN_API_ADDRESS}, {5, 400}, REG_END}, {2, PLUGIN_API_ADDRESS+400, "\x11\xA2"},
+	{ {6, TESTCASE_PLUGIN_API_ADDRESS}, {5, 400}, REG_END}, {2, TESTCASE_PLUGIN_API_ADDRESS+400, "\x11\xA2"},
 	{ {7, 0xFFFFA211}, REG_END}, NO_MEMORY},
 /* LSL (immediate) */
 	{ "lsls r6, r5, #16", INSTR_5_imm5_Rm_Rd(0x00, 16, 5, 6),
@@ -315,15 +315,15 @@ const testcase_t	testcases[] =
 	{ {1, 0xFFFFFFFF}, {INDEX_APSR, FLAG_N|FLAG_V}, REG_END}, NO_MEMORY},
 /* POP */
 	{ "pop {r1, r7, pc}", 0xbd82, INSTRUCTION_16BIT,
-	{ {INDEX_SP, PLUGIN_STACK_ADDRESS-3*4}, REG_END},
-	{ 3*4, PLUGIN_STACK_ADDRESS-3*4, "\x11\x11\x11\x11\x77\x77\x77\x77\x10\x70\x00\x00"},
-	{ {1, 0x11111111}, {7, 0x77777777}, {INDEX_PC, 0x7010}, {INDEX_SP, PLUGIN_STACK_ADDRESS}, REG_END}, NO_MEMORY},
+	{ {INDEX_SP, TESTCASE_PLUGIN_STACK_ADDRESS-3*4}, REG_END},
+	{ 3*4, TESTCASE_PLUGIN_STACK_ADDRESS-3*4, "\x11\x11\x11\x11\x77\x77\x77\x77\x10\x70\x00\x00"},
+	{ {1, 0x11111111}, {7, 0x77777777}, {INDEX_PC, 0x7010}, {INDEX_SP, TESTCASE_PLUGIN_STACK_ADDRESS}, REG_END}, NO_MEMORY},
 /* PUSH */
 	{ "push {r6, r7, lr}",	0xb5c0, INSTRUCTION_16BIT,
-	{ {6, 0x16}, {7, 0x17}, {INDEX_LR, 0x44332211}, {INDEX_SP, DEFAULT_SP}, REG_END},
+	{ {6, 0x16}, {7, 0x17}, {INDEX_LR, 0x44332211}, {INDEX_SP, TESTCASE_DEFAULT_SP}, REG_END},
 	NO_MEMORY,
-	{{INDEX_SP, DEFAULT_SP - 3*4}, REG_END},
-	{ 3*4, DEFAULT_SP-3*4, "\x16\x00\x00\x00" "\x17\x00\x00\x00"  "\x11\x22\x33\x44"} },
+	{{INDEX_SP, TESTCASE_DEFAULT_SP - 3*4}, REG_END},
+	{ 3*4, TESTCASE_DEFAULT_SP-3*4, "\x16\x00\x00\x00" "\x17\x00\x00\x00"  "\x11\x22\x33\x44"} },
 /* REV */
 	{ "rev r0, r6", INSTR_10_Rm_Rd(0x2E8, 6, 0),
 	{ {6, 0x87654321}, REG_END}, NO_MEMORY,
@@ -359,36 +359,36 @@ const testcase_t	testcases[] =
 /* SEV: not implemented. */
 /* STM */
 	{ "stm r1!, {r0, r6}", INSTR_5_Rn_imm8(0x18, 1, ((1<<0)|(1<<6))),
-	{ {1, PLUGIN_DATA_ADDRESS+400}, {0, 0x12345678}, {6, 0x11223344}, REG_END}, NO_MEMORY,
-	{ {1, PLUGIN_DATA_ADDRESS+400+2*4}, REG_END}, {8, PLUGIN_DATA_ADDRESS+400, "\x78\x56\x34\x12" "\x44\x33\x22\x11"} },
+	{ {1, TESTCASE_PLUGIN_DATA_ADDRESS+400}, {0, 0x12345678}, {6, 0x11223344}, REG_END}, NO_MEMORY,
+	{ {1, TESTCASE_PLUGIN_DATA_ADDRESS+400+2*4}, REG_END}, {8, TESTCASE_PLUGIN_DATA_ADDRESS+400, "\x78\x56\x34\x12" "\x44\x33\x22\x11"} },
 /* STR (immediate): Encoding T1 */
 	{ "str r7, r6, +0x10", INSTR_5_imm5_Rn_Rt(0x0C, 0x10/4, 6, 7),
-	{ {6, PLUGIN_DATA_ADDRESS+400}, {7, 0x99887766}, REG_END}, NO_MEMORY,
-	NO_REGISTERS, {4, PLUGIN_DATA_ADDRESS+400+0x10, "\x66\x77\x88\x99"} },
+	{ {6, TESTCASE_PLUGIN_DATA_ADDRESS+400}, {7, 0x99887766}, REG_END}, NO_MEMORY,
+	NO_REGISTERS, {4, TESTCASE_PLUGIN_DATA_ADDRESS+400+0x10, "\x66\x77\x88\x99"} },
 /* STR (immediate): Encoding T2 */
 	{ "str r6, sp, +0x40", INSTR_5_Rt_imm8(0x12, 6, 0x40/4),
-	{ {INDEX_SP, PLUGIN_STACK_ADDRESS-400}, {6, 0x55667788}, REG_END}, NO_MEMORY,
-	NO_REGISTERS, {4, PLUGIN_STACK_ADDRESS-400+0x40, "\x88\x77\x66\x55"} },
+	{ {INDEX_SP, TESTCASE_PLUGIN_STACK_ADDRESS-400}, {6, 0x55667788}, REG_END}, NO_MEMORY,
+	NO_REGISTERS, {4, TESTCASE_PLUGIN_STACK_ADDRESS-400+0x40, "\x88\x77\x66\x55"} },
 /* STR (register) */
 	{ "str r5, r6, r7", INSTR_7_Rm_Rn_Rt(0x28, 7, 6, 5),
-	{ {5, 0x11992288}, {6, PLUGIN_DATA_ADDRESS}, {7, 0x200}, REG_END}, NO_MEMORY,
-	NO_REGISTERS, {4, PLUGIN_DATA_ADDRESS+0x200, "\x88\x22\x99\x11" } },
+	{ {5, 0x11992288}, {6, TESTCASE_PLUGIN_DATA_ADDRESS}, {7, 0x200}, REG_END}, NO_MEMORY,
+	NO_REGISTERS, {4, TESTCASE_PLUGIN_DATA_ADDRESS+0x200, "\x88\x22\x99\x11" } },
 /* STRB (immediate) */
 	{ "strb r5, r4, +#30", INSTR_5_imm5_Rn_Rt(0x0E, 30, 4, 5),
-	{ {5, 0x11223344}, {4, PLUGIN_DATA_ADDRESS+0x100}, REG_END}, NO_MEMORY,
-	NO_REGISTERS, {1, PLUGIN_DATA_ADDRESS+0x100+30, "\x44" } },
+	{ {5, 0x11223344}, {4, TESTCASE_PLUGIN_DATA_ADDRESS+0x100}, REG_END}, NO_MEMORY,
+	NO_REGISTERS, {1, TESTCASE_PLUGIN_DATA_ADDRESS+0x100+30, "\x44" } },
 /* STRB (register) */
 	{ "strb r4, r6, r7", INSTR_7_Rm_Rn_Rt(0x2A, 7, 6, 4),
-	{ {4, 0x44332211}, {6, PLUGIN_DATA_ADDRESS+0x30}, {7, 0x40}, REG_END}, NO_MEMORY,
-	NO_REGISTERS, {1, PLUGIN_DATA_ADDRESS+0x30+0x40, "\x11" } },
+	{ {4, 0x44332211}, {6, TESTCASE_PLUGIN_DATA_ADDRESS+0x30}, {7, 0x40}, REG_END}, NO_MEMORY,
+	NO_REGISTERS, {1, TESTCASE_PLUGIN_DATA_ADDRESS+0x30+0x40, "\x11" } },
 /* STRH (immediate) */
 	{ "strh r5, r3, +#12", INSTR_5_imm5_Rn_Rt(0x10, 12/2, 3, 5),
-	{ {5, 0x66778899}, {3, PLUGIN_DATA_ADDRESS+0x300}, REG_END}, NO_MEMORY,
-	NO_REGISTERS, {2, PLUGIN_DATA_ADDRESS+0x300+12, "\x99\x88"} },
+	{ {5, 0x66778899}, {3, TESTCASE_PLUGIN_DATA_ADDRESS+0x300}, REG_END}, NO_MEMORY,
+	NO_REGISTERS, {2, TESTCASE_PLUGIN_DATA_ADDRESS+0x300+12, "\x99\x88"} },
 /* STRH (register) */
 	{ "strh r4, r5, r6", INSTR_7_Rm_Rn_Rt(0x29, 6, 5, 4),
-	{ {4, 0x88776655}, {5, PLUGIN_DATA_ADDRESS+0x100}, {6, 0x100}, REG_END}, NO_MEMORY,
-	NO_REGISTERS, {2, PLUGIN_DATA_ADDRESS+0x100+0x100, "\x55\x66"} },
+	{ {4, 0x88776655}, {5, TESTCASE_PLUGIN_DATA_ADDRESS+0x100}, {6, 0x100}, REG_END}, NO_MEMORY,
+	NO_REGISTERS, {2, TESTCASE_PLUGIN_DATA_ADDRESS+0x100+0x100, "\x55\x66"} },
 /* SUB (immediate) */
 	{ "sub r3, r4, #3", INSTR_7_imm3_Rn_Rd(0x0F, 3, 4, 3),
 	{ {4, 10}, {INDEX_APSR, 0}, REG_END}, NO_MEMORY,
@@ -399,8 +399,8 @@ const testcase_t	testcases[] =
 	{ {2, 0}, {INDEX_APSR, FLAG_Z|FLAG_C}, REG_END}, NO_MEMORY},
 /* SUB (SP minus immediate) */
 	{ "sub sp, sp, #500", INSTR_9_imm7(0x161, 500/4),
-	{ {INDEX_SP, PLUGIN_STACK_ADDRESS}, REG_END}, NO_MEMORY,
-	{ {INDEX_SP, PLUGIN_STACK_ADDRESS-500}, REG_END}, NO_MEMORY},
+	{ {INDEX_SP, TESTCASE_PLUGIN_STACK_ADDRESS}, REG_END}, NO_MEMORY,
+	{ {INDEX_SP, TESTCASE_PLUGIN_STACK_ADDRESS-500}, REG_END}, NO_MEMORY},
 /* SVC: not implemented. */
 /* SXTB */
 	{ "sxtb r1, r2", INSTR_10_Rm_Rd(0x2C9, 2, 1),
@@ -467,7 +467,7 @@ typedef struct
 uint8_t	program_memory[8 * 1024];
 
 /// Data memory.
-uint8_t	data_memory[DATA_MEMORY_SIZE];
+uint8_t	data_memory[TESTCASE_DATA_MEMORY_SIZE];
 
 /// Service API memory.
 const SERVICE_API service_api = {
@@ -484,18 +484,22 @@ const SERVICE_API service_api = {
 /// Last function called address.
 uint32_t	last_function_call = -1;
 
+/** Static emulator state for tests. */
+static struct arm_emulator_state emu;
+
 //============================================================
 int
 arm_emulator_callback_read_program_memory(
-	uint8_t*			Buffer,
-	const uint32_t		Address,
-	const uint8_t		Count
-)
+	struct arm_emulator_state *state,
+	uint8_t *buffer,
+	uint32_t address,
+	size_t count)
 {
-	const uint32_t	offset = Address - PLUGIN_API_ADDRESS;
-	if (offset<PLUGIN_API_SIZE && offset+Count <= PLUGIN_API_SIZE)
+	(void)state;
+	const uint32_t offset = address - TESTCASE_PLUGIN_API_ADDRESS;
+	if (offset < TESTCASE_PLUGIN_API_SIZE && offset + count <= TESTCASE_PLUGIN_API_SIZE)
 	{
-		memcpy(Buffer, program_memory+ offset, Count);
+		memcpy(buffer, program_memory + offset, count);
 		return 0;
 	}
 	else
@@ -507,13 +511,12 @@ arm_emulator_callback_read_program_memory(
 //============================================================
 int
 arm_emulator_callback_functioncall(
-	const uint32_t		FunctionAddress,
-	ARM_EMULATOR_STATE*	State
-)
+	struct arm_emulator_state *state,
+	uint32_t function_address)
 {
-	(void)State;
-	last_function_call = FunctionAddress;
-	// No action to be taken.
+	(void)state;
+	last_function_call = function_address;
+	/* No action to be taken. */
 	return -1;
 }
 
@@ -524,24 +527,23 @@ static const char*	_rnames[16] = {
 
 //============================================================
 int
-testcase_run(
-	const testcase_t*	testcase)
+testcase_run(const struct testcase *testcase)
 {
-	int							return_value = 0;
-	ARM_EMULATOR_RETURN_VALUE	arm_r;
-	ARM_EMULATOR_STATE			state_before;
-	uint8_t						expected_data_memory[DATA_MEMORY_SIZE];
-	unsigned int				prepared_registers_mask = 0;
-	unsigned int				checked_registers_mask = 0;
-	uint32_t					instruction_address = -1;
-	size_t						i;
+	int return_value = 0;
+	enum arm_emulator_result arm_r;
+	struct arm_emulator_state state_before;
+	uint8_t expected_data_memory[TESTCASE_DATA_MEMORY_SIZE];
+	unsigned int prepared_registers_mask = 0;
+	unsigned int checked_registers_mask = 0;
+	uint32_t instruction_address = -1;
+	size_t i;
 
-	// 1. Initialize the simulator.
+	/* 1. Initialize the simulator. */
 	arm_emulator_reset(
-		&program_memory[0], PLUGIN_API_ADDRESS, sizeof(program_memory),
-		data_memory, PLUGIN_DATA_ADDRESS, sizeof(data_memory),
-		(uint8_t*)&service_api, SERVICE_API_ADDRESS, sizeof(service_api)
-		);
+		&emu,
+		&program_memory[0], TESTCASE_PLUGIN_API_ADDRESS, sizeof(program_memory),
+		data_memory, TESTCASE_PLUGIN_DATA_ADDRESS, sizeof(data_memory),
+		(uint8_t *)&service_api, TESTCASE_SERVICE_API_ADDRESS, sizeof(service_api));
 
 	// 2. Fill memory and registers with random stuff.
 	for (i=0; i<sizeof(program_memory); ++i)
@@ -552,19 +554,19 @@ testcase_run(
 	{
 		data_memory[i] = rand();
 	}
-	for (i=0; i<ARM_NREGISTERS; ++i)
+	for (i = 0; i < ARM_NREGISTERS; ++i)
 	{
-		global_emulator.R[i] = (rand()<<16) | rand();;
+		emu.R[i] = (rand() << 16) | rand();
 	}
-	global_emulator.APSR = (rand() & 0x0F) << 28;
+	emu.APSR = (rand() & 0x0F) << 28;
 
-	// 4. Insert bytes expected to be read.
-	if (testcase->expected_reads.count>0)
+	/* 4. Insert bytes expected to be read. */
+	if (testcase->expected_reads.count > 0)
 	{
-		const testcase_memory_access_t*	er = & testcase->expected_reads;
+		const struct testcase_memory_access *er = &testcase->expected_reads;
 		{
-			const uint32_t	program_offset = er->address - PLUGIN_API_ADDRESS;
-			const uint32_t	data_offset = er->address - PLUGIN_DATA_ADDRESS;
+			const uint32_t program_offset = er->address - TESTCASE_PLUGIN_API_ADDRESS;
+			const uint32_t data_offset = er->address - TESTCASE_PLUGIN_DATA_ADDRESS;
 			if (program_offset<sizeof(program_memory) && program_offset+er->count<=sizeof(program_memory))
 			{
 				memcpy(program_memory+program_offset, er->data, er->count);
@@ -582,29 +584,29 @@ testcase_run(
 		}
 	}
 
-	// 5. Update registers.
-	for (i=0; i<MAX_REGISTERS && testcase->registers_before[i].index>=0; ++i)
+	/* 5. Update registers. */
+	for (i = 0; i < MAX_REGISTERS && testcase->registers_before[i].index >= 0; ++i)
 	{
-		const testcase_register_t*	rb = testcase->registers_before + i;
+		const struct testcase_register *rb = testcase->registers_before + i;
 		if (rb->index == INDEX_APSR)
 		{
-			global_emulator.APSR = rb->value;
+			emu.APSR = rb->value;
 		}
 		else
 		{
-			global_emulator.R[rb->index] = rb->value;
+			emu.R[rb->index] = rb->value;
 		}
 		prepared_registers_mask |= 1 << rb->index;
 	}
 
-	// 3. Inject instruction
+	/* 3. Inject instruction */
 	if (!(prepared_registers_mask & (1 << INDEX_PC)))
 	{
-		global_emulator.R[INDEX_PC] = DEFAULT_PC;
+		emu.R[INDEX_PC] = TESTCASE_DEFAULT_PC;
 	}
-	instruction_address = global_emulator.R[INDEX_PC];
+	instruction_address = emu.R[INDEX_PC];
 	{
-		const uint32_t	instruction_offset = instruction_address - PLUGIN_API_ADDRESS;
+		const uint32_t instruction_offset = instruction_address - TESTCASE_PLUGIN_API_ADDRESS;
 		if (instruction_offset>=sizeof(program_memory) || instruction_offset+3>=sizeof(program_memory))
 		{
 			printf("%s: invalid instruction address 0x%04X\n",
@@ -620,10 +622,10 @@ testcase_run(
 		}
 	}
 
-	// 6. Run the instruction.
-	state_before = global_emulator;
+	/* 6. Run the instruction. */
+	state_before = emu;
 	memcpy(expected_data_memory, data_memory, sizeof(data_memory));
-	arm_r = arm_emulator_execute(1);
+	arm_r = arm_emulator_execute(&emu, 1);
 	if (arm_r != ARM_EMULATOR_OK)
 	{
 		printf("%s: Emulator error %d.\n",
@@ -631,76 +633,75 @@ testcase_run(
 		return -1;
 	}
 
-	// 7. Check registers.
+	/* 7. Check registers. */
 	checked_registers_mask = 0;
-	for (i=0; i<MAX_REGISTERS && testcase->registers_after[i].index>=0; ++i)
+	for (i = 0; i < MAX_REGISTERS && testcase->registers_after[i].index >= 0; ++i)
 	{
-		const testcase_register_t*	rb = testcase->registers_after + i;
+		const struct testcase_register *rb = testcase->registers_after + i;
 		checked_registers_mask |= 1 << rb->index;
 		if (rb->index == INDEX_APSR)
 		{
-			if (global_emulator.APSR != rb->value)
+			if (emu.APSR != rb->value)
 			{
 				printf("%s: APSR mismatch, expected 0x%04X, got 0x%04X\n",
-					testcase->name, rb->value, global_emulator.APSR);
+					testcase->name, rb->value, emu.APSR);
 				return_value = -1;
 			}
 		}
 		else
 		{
-			if (global_emulator.R[rb->index] != rb->value)
+			if (emu.R[rb->index] != rb->value)
 			{
 				printf("%s: Register %s mismatch, expected 0x%04X, got 0x%04X\n",
-					testcase->name, _rnames[rb->index], rb->value, global_emulator.R[rb->index]);
+					testcase->name, _rnames[rb->index], rb->value, emu.R[rb->index]);
 				return_value = -1;
 			}
 		}
 	}
-	// 8. Check remaining registers
-	// PC needs some special handling.
-	for (i=0; i<INDEX_PC; ++i)
+	/* 8. Check remaining registers. PC needs special handling. */
+	for (i = 0; i < INDEX_PC; ++i)
 	{
-		if (! (checked_registers_mask & (1<<i)))
+		if (!(checked_registers_mask & (1 << i)))
 		{
 			checked_registers_mask |= 1 << i;
-			if (global_emulator.R[i] != state_before.R[i])
+			if (emu.R[i] != state_before.R[i])
 			{
 				printf("%s: Register %s mismatch, expected 0x%04X, got 0x%04X\n",
-					testcase->name, _rnames[i], state_before.R[i], global_emulator.R[i]);
+					testcase->name, _rnames[i], state_before.R[i], emu.R[i]);
 				return_value = -1;
 			}
 		}
 	}
-	if (! (checked_registers_mask & (1 << INDEX_PC)))
+	if (!(checked_registers_mask & (1 << INDEX_PC)))
 	{
-		const uint32_t	expected_pc = testcase->instruction2>=0
+		const uint32_t expected_pc = testcase->instruction2 >= 0
 			? instruction_address + 4
 			: instruction_address + 2;
 		checked_registers_mask |= 1 << INDEX_PC;
-		if (expected_pc != global_emulator.R[INDEX_PC])
+		if (expected_pc != emu.R[INDEX_PC])
 		{
 			printf("%s: PC mismatch, expected 0x%04X, got 0x%04X\n",
-				testcase->name, expected_pc, global_emulator.R[INDEX_PC]);
+				testcase->name, expected_pc, emu.R[INDEX_PC]);
 			return_value = -1;
 		}
 	}
-	if (! (checked_registers_mask & (1 << INDEX_APSR)))
+	if (!(checked_registers_mask & (1 << INDEX_APSR)))
 	{
 		checked_registers_mask |= 1 << INDEX_APSR;
-		if (global_emulator.APSR != state_before.APSR)
+		if (emu.APSR != state_before.APSR)
 		{
 			printf("%s: APSR mismatch, expected 0x%04X, got 0x%04X\n",
-				testcase->name, state_before.APSR, global_emulator.APSR);
+				testcase->name, state_before.APSR, emu.APSR);
 			return_value = -1;
 		}
 	}
 
-	// 9. Check the memory...
-	if (testcase->expected_writes.count>0)
+	/* 9. Check the memory... */
+	if (testcase->expected_writes.count > 0)
 	{
-		const testcase_memory_access_t*	ew = & testcase->expected_writes;
+		const struct testcase_memory_access *ew = &testcase->expected_writes;
 		{
-			const uint32_t	data_offset = ew->address - PLUGIN_DATA_ADDRESS;
+			const uint32_t data_offset = ew->address - TESTCASE_PLUGIN_DATA_ADDRESS;
 			if (data_offset<sizeof(data_memory) && data_offset+ew->count<=sizeof(data_memory))
 			{
 				memcpy(expected_data_memory+data_offset, ew->data, ew->count);
@@ -713,15 +714,16 @@ testcase_run(
 			}
 		}
 	}
-	for (i=0; i<DATA_MEMORY_SIZE; ++i)
+	for (i = 0; i < TESTCASE_DATA_MEMORY_SIZE; ++i)
 	{
 		if (expected_data_memory[i] != data_memory[i])
 		{
 			printf("%s: Data address 0x%04X: expected 0x%02X, got 0x%02X\n",
-				testcase->name, (unsigned int)(i+PLUGIN_DATA_ADDRESS), expected_data_memory[i], data_memory[i]);
+				testcase->name, (unsigned int)(i + TESTCASE_PLUGIN_DATA_ADDRESS),
+				expected_data_memory[i], data_memory[i]);
 			return_value = -1;
 		}
 	}
-	// 10. Sure we are OK?
+	/* 10. Sure we are OK? */
 	return return_value;
 }

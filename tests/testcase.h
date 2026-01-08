@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
-#ifndef testcase_h_
-#define testcase_h_
+#ifndef TESTCASE_H
+#define TESTCASE_H
 
 #include "arm_emulator.h"
 
@@ -14,14 +14,14 @@ enum {
 
 /* Memory sizes must fit microcontroller as well. */
 enum {
-	PLUGIN_API_ADDRESS = 0x6000,
-	PLUGIN_API_SIZE = 0x2000,
-	SERVICE_API_ADDRESS = 0x200,
-	PLUGIN_DATA_ADDRESS = (0x10000000 + 0x200),
-	DATA_MEMORY_SIZE = 1024,
-	PLUGIN_STACK_ADDRESS = PLUGIN_DATA_ADDRESS + DATA_MEMORY_SIZE,
-	DEFAULT_PC = PLUGIN_API_ADDRESS + 0x1C,
-	DEFAULT_SP = PLUGIN_DATA_ADDRESS + DATA_MEMORY_SIZE,
+	TESTCASE_PLUGIN_API_ADDRESS = 0x6000,
+	TESTCASE_PLUGIN_API_SIZE = 0x2000,
+	TESTCASE_SERVICE_API_ADDRESS = 0x200,
+	TESTCASE_PLUGIN_DATA_ADDRESS = (0x10000000 + 0x200),
+	TESTCASE_DATA_MEMORY_SIZE = 1024,
+	TESTCASE_PLUGIN_STACK_ADDRESS = TESTCASE_PLUGIN_DATA_ADDRESS + TESTCASE_DATA_MEMORY_SIZE,
+	TESTCASE_DEFAULT_PC = TESTCASE_PLUGIN_API_ADDRESS + 0x1C,
+	TESTCASE_DEFAULT_SP = TESTCASE_PLUGIN_DATA_ADDRESS + TESTCASE_DATA_MEMORY_SIZE,
 };
 
 enum {
@@ -57,49 +57,48 @@ enum {
 	COND_TRUE2 = 0x0F
 };
 
-typedef struct {
-	// 0...14: normal
-	// 15 = PC
-	// 16 = APSR.
-	int			index;
-	uint32_t	value;
-} testcase_register_t;
+struct testcase_register {
+	/* 0...14: normal, 15 = PC, 16 = APSR. */
+	int index;
+	uint32_t value;
+};
 
-typedef struct {
-	unsigned int	count;
-	uint32_t		address;
-	const char*		data;
-} testcase_memory_access_t;
+struct testcase_memory_access {
+	unsigned int count;
+	uint32_t address;
+	const char *data;
+};
 
-typedef struct {
+struct testcase {
 	/** Name of the test. Nullpointer signals end of test cases. */
-	const char*		name;
+	const char *name;
 	/** 16-bit instructions. */
-	uint16_t		instruction;
+	uint16_t instruction;
 	/** Second part of 32-bit instruction, if >=0. */
-	int32_t			instruction2;
+	int32_t instruction2;
 	/** Register values to be set before execution.
-	  All registers (incl. APSR) can be specified. */
-	testcase_register_t			registers_before[MAX_REGISTERS];
+	    All registers (incl. APSR) can be specified. */
+	struct testcase_register registers_before[MAX_REGISTERS];
 	/** Memory expected to be read. */
-	testcase_memory_access_t	expected_reads;
+	struct testcase_memory_access expected_reads;
 
-	/** Registers expected to be modified. Other registers are expected to remain intact.
-	* Special cases: Do not specify PC unless the instruction explicitly modifies PC.
-	*/
-	testcase_register_t			registers_after[MAX_REGISTERS];
+	/** Registers expected to be modified. Other registers are expected
+	    to remain intact.
+	    Special cases: Do not specify PC unless the instruction
+	    explicitly modifies PC. */
+	struct testcase_register registers_after[MAX_REGISTERS];
 
-	/** Memory expected to be written. Other areas are expected to remain intact. */
-	testcase_memory_access_t	expected_writes;
-} testcase_t;
+	/** Memory expected to be written. Other areas are expected to
+	    remain intact. */
+	struct testcase_memory_access expected_writes;
+};
 
-extern const testcase_t	testcases[];
+extern const struct testcase testcases[];
 
-extern int testcase_run(
-	const testcase_t*	testcase);
+extern int testcase_run(const struct testcase *testcase);
 
 #if defined(__cplusplus)
 }
 #endif
 
-#endif /* testcase_h_ */
+#endif /* TESTCASE_H */
