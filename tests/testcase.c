@@ -511,6 +511,7 @@ arm_emulator_callback_functioncall(
 	ARM_EMULATOR_STATE*	State
 )
 {
+	(void)State;
 	last_function_call = FunctionAddress;
 	// No action to be taken.
 	return -1;
@@ -533,7 +534,7 @@ testcase_run(
 	unsigned int				prepared_registers_mask = 0;
 	unsigned int				checked_registers_mask = 0;
 	uint32_t					instruction_address = -1;
-	int							i;
+	size_t						i;
 
 	// 1. Initialize the simulator.
 	arm_emulator_reset(
@@ -717,7 +718,7 @@ testcase_run(
 		if (expected_data_memory[i] != data_memory[i])
 		{
 			printf("%s: Data address 0x%04X: expected 0x%02X, got 0x%02X\n",
-				testcase->name, i+PLUGIN_DATA_ADDRESS, expected_data_memory[i], data_memory[i]);
+				testcase->name, (unsigned int)(i+PLUGIN_DATA_ADDRESS), expected_data_memory[i], data_memory[i]);
 			return_value = -1;
 		}
 	}

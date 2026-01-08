@@ -12,6 +12,8 @@ main(
 	char**	argv)
 {
 	const testcase_t*	testcase;
+	(void)argc;
+	(void)argv;
 
 	srand((unsigned int)time(0));
 	for (testcase=testcases; testcase->name!=NULL; ++testcase)

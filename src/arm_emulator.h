@@ -86,7 +86,7 @@ arm_emulator_execute(
 	const unsigned int	max_number_of_instructions);
 
 /** Get function return value, i.e. R0. */
-extern const uint32_t
+extern uint32_t
 arm_emulator_get_function_return_value(void);
 
 /** Write register dump to uart. */

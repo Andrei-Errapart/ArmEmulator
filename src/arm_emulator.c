@@ -46,7 +46,7 @@ static void _print_PUSH(
 		const uint8_t	this_round = list & 0x80;
 		if (this_round)
 		{
-			printf(_rnames[7-i]);
+			printf("%s", _rnames[7-i]);
 		}
 		list = list << 1;
 		if (this_round && list)
@@ -71,7 +71,7 @@ static void _print_POP(
 		const uint8_t	this_round = list & 1;
 		if (this_round)
 		{
-			printf(_rnames[i]);
+			printf("%s", _rnames[i]);
 		}
 		list = list >> 1;
 		if (this_round && (list || p))
@@ -100,7 +100,7 @@ static void _print_STM(
 		const uint8_t	this_round = list & 1;
 		if (this_round)
 		{
-			printf(_rnames[i]);
+			printf("%s", _rnames[i]);
 		}
 		list = list >> 1;
 		if (this_round && list)
@@ -125,7 +125,7 @@ static void _print_LDM(
 		const uint8_t	this_round = list & 1;
 		if (this_round)
 		{
-			printf(_rnames[i]);
+			printf("%s", _rnames[i]);
 		}
 		list = list >> 1;
 		if (this_round && list)
@@ -442,7 +442,7 @@ arm_emulator_start_function_call(
 	_reset_registers();
 
 	LR = EMULATOR_RETURN_ADDRESS;
-	PC = ((uint32_t)function_address) & ~(1); // thumb all the way!
+	PC = ((uint32_t)(uintptr_t)function_address) & ~(uint32_t)(1); // thumb all the way!
 	if (arguments!=0 && arguments_size>0)
 	{
 		for (i=0; i<arguments_size && i<4; ++i)
@@ -1637,7 +1637,7 @@ arm_emulator_execute(
 }
 
 //================================================================================================================
-const uint32_t
+uint32_t
 arm_emulator_get_function_return_value(void)
 {
 	return self->R[0];

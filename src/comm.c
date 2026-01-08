@@ -34,7 +34,7 @@ void UARTSend(const uint8_t *BufferPtr, uint32_t Length)
 static const char* _hextable = "0123456789ABCDEF";
 
 //============================================================
-static const char _toupper(const char c)
+static char _toupper(const char c)
 {
 	return c>='a' && c<='z' ? (c + 'A'-'a') : c;
 }
