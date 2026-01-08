@@ -49,7 +49,7 @@ enum arm_emulator_result {
 };
 
 /**
- * Reset emulator state and configure memory regions.
+ * Initialize emulator state and configure memory regions.
  *
  * @param emu Emulator state to initialize.
  * @param program_memory Program memory buffer.
@@ -62,7 +62,7 @@ enum arm_emulator_result {
  * @param service_address Base address for service memory.
  * @param service_size Size of service memory in bytes.
  */
-void arm_emulator_reset(
+void arm_emulator_init(
 	struct arm_emulator_state *emu,
 	const uint8_t *program_memory,
 	uint32_t program_memory_address,
@@ -73,6 +73,14 @@ void arm_emulator_reset(
 	const uint8_t *service,
 	uint32_t service_address,
 	size_t service_size);
+
+/**
+ * Reset emulator registers to initial state.
+ * Memory regions are preserved. Can be called to re-run code.
+ *
+ * @param emu Emulator state to reset.
+ */
+void arm_emulator_reset(struct arm_emulator_state *emu);
 
 /**
  * Read memory from any region (program, data, or service).

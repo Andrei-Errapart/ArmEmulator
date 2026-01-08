@@ -119,7 +119,7 @@ int main(void)
 
     memcpy(program_memory, code, sizeof(code));
 
-    arm_emulator_reset(
+    arm_emulator_init(
         &emu,
         program_memory, 0x6000, sizeof(program_memory),
         data_memory, 0x10000000, sizeof(data_memory),

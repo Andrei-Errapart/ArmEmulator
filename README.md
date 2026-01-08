@@ -24,7 +24,7 @@ uint8_t program_memory[4096];
 uint8_t data_memory[1024];
 
 /* Initialize with memory regions */
-arm_emulator_reset(
+arm_emulator_init(
     &emu,
     program_memory, 0x6000, sizeof(program_memory),  /* Program */
     data_memory, 0x10000000, sizeof(data_memory),    /* Data */

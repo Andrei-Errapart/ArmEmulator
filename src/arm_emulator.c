@@ -357,7 +357,14 @@ _AddWithCarryDiscard(
 
 //================================================================================================================
 void
-arm_emulator_reset(
+arm_emulator_reset(struct arm_emulator_state *emu)
+{
+	_reset_registers(emu);
+}
+
+//================================================================================================================
+void
+arm_emulator_init(
 	struct arm_emulator_state *emu,
 	const uint8_t *program_memory,
 	uint32_t program_memory_address,
@@ -382,7 +389,7 @@ arm_emulator_reset(
 	emu->service_size = service_size;
 
 	memset(emu->data, 0, emu->data_size);
-	_reset_registers(emu);
+	arm_emulator_reset(emu);
 }
 
 //================================================================================================================

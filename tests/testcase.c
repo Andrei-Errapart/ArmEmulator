@@ -539,7 +539,7 @@ testcase_run(const struct testcase *testcase)
 	size_t i;
 
 	/* 1. Initialize the simulator. */
-	arm_emulator_reset(
+	arm_emulator_init(
 		&emu,
 		&program_memory[0], TESTCASE_PLUGIN_API_ADDRESS, sizeof(program_memory),
 		data_memory, TESTCASE_PLUGIN_DATA_ADDRESS, sizeof(data_memory),

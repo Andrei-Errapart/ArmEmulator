@@ -204,7 +204,7 @@ int main(void)
     printf("  Plugin data: 0x%08X\n", DATA_BASE);
     printf("\n");
 
-    arm_emulator_reset(
+    arm_emulator_init(
         &emu,
         program_memory, PROGRAM_BASE, sizeof(program_memory),
         data_memory, DATA_BASE, sizeof(data_memory),
