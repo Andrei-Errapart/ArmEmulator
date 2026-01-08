@@ -8,29 +8,39 @@ ARM Cortex-M0 emulator implementing the Thumb-2 instruction set, specifically de
 
 ## Build Commands
 
-**Windows (Visual Studio):**
-- Open `TestEmulator.sln` in Visual Studio 2013+
-- Build configurations: Debug/Release (Win32)
-
-**Unix/Linux/macOS (manual):**
+**Unix/Linux/macOS:**
 ```bash
-gcc -o arm_emulator arm_emulator.c comm.c testcase.c main.c
+make          # Build test executable
+make test     # Build and run tests
+make lib      # Build libarm_emulator.a static library
+make clean    # Remove build artifacts
 ```
 
-**Running Tests:**
-Execute the compiled binary. The test harness in `main.c` iterates through `testcases[]` array and validates each instruction.
+**Windows (Visual Studio):**
+- Open `vs/TestEmulator.sln` in Visual Studio 2013+
+- Build configurations: Debug/Release (Win32)
 
 ## Architecture
+
+### Directory Structure
+
+```
+src/           Core emulator library
+tests/         Test harness
+vs/            Visual Studio project files
+```
+
+**Build artifacts (gitignored):** `*.o`, `*.a`, `test_emulator`
 
 ### Core Components
 
 | File | Purpose |
 |------|---------|
-| `arm_emulator.c/h` | Instruction decoder/executor (~1,700 lines) |
-| `api.h` | Plugin and service API definitions |
-| `comm.c/h` | UART/I2C communication utilities |
-| `testcase.c/h` | Comprehensive instruction test suite |
-| `main.c` | Test harness entry point |
+| `src/arm_emulator.c/h` | Instruction decoder/executor (~1,700 lines) |
+| `src/api.h` | Plugin and service API definitions |
+| `src/comm.c/h` | UART/I2C communication utilities |
+| `tests/testcase.c/h` | Comprehensive instruction test suite |
+| `tests/main.c` | Test harness entry point |
 
 ### Memory Layout
 
@@ -60,5 +70,5 @@ Constants defined in `arm_emulator.h`: `COND_EQ` (0x0) through `COND_TRUE2` (0xF
 - Uses bit-masking macros for instruction field extraction
 - Global `ARM_EMULATOR_STATE global_emulator` provides test access
 - Callbacks handle external function calls and program memory reads
-- Conditional compilation via `_MSC_VER` for printf vs embedded UART output
+- Conditional compilation via `_MSC_VER` or `DESKTOP_BUILD` for portable C vs embedded ARM assembly
 - Test cases encode expected register states, memory reads/writes for validation

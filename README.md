@@ -1,6 +1,12 @@
-An Cortex-M0 emulator.
+# ArmEmulator
 
-Testcases for all of the instructions.
+A Cortex-M0 emulator implementing the Thumb-2 instruction set, intended for use with the NXP LPC1114 microcontroller.
 
-Intended for use in LPC1114.
+## Quickstart
 
+```bash
+make          # Build test executable
+make test     # Build and run tests
+make lib      # Build static library
+make clean    # Remove build artifacts
+```

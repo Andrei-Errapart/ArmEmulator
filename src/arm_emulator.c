@@ -8,7 +8,7 @@ static const char*	_rnames[16] = {
 	"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7",
 	"R8", "R9", "R10", "R11", "R12", "SP", "LR", "PC" };
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(DESKTOP_BUILD)
 #include <stdio.h>	// printf
 // error printf
 #define	xprintf(args)	do { printf args; } while(0)
@@ -292,7 +292,7 @@ _AddWithCarry(
 	const uint32_t	x2,
 	const uint8_t	carry)
 {
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(DESKTOP_BUILD)
 	const uint64_t	u64 = ((uint64_t)x1) + ((uint64_t)x2) + carry;
 	const int64_t	i64 = ((int64_t)((int32_t)x1)) + ((int64_t)((int32_t)x2)) + carry;
 	self->R[Rd] = (uint32_t)u64;
@@ -329,7 +329,7 @@ _AddWithCarryDiscard(
 	const uint32_t	x2,
 	const uint8_t	carry)
 {
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(DESKTOP_BUILD)
 	const uint64_t	u64 = ((uint64_t)x1) + ((uint64_t)x2) + carry;
 	const int64_t	i64 = ((int64_t)((int32_t)x1)) + ((int64_t)((int32_t)x2)) + carry;
 	_set_APSR_of_NZCV(

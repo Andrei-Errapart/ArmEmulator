@@ -3,7 +3,7 @@
 #include "LPC11xx.h"
 #endif
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(DESKTOP_BUILD)
 #include <stdint.h>	// int8_t, etc.
 #include <stdio.h>	// printf, etc.
 #else
@@ -20,7 +20,7 @@
 #include "comm.h"
 #include "api.h" // use some functions from them, too.
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(DESKTOP_BUILD)
 void UARTSend(const uint8_t *BufferPtr, uint32_t Length)
 {
 	uint32_t	i;
@@ -142,7 +142,7 @@ uint8_of_hex2(const char* hex)
 	}
 }
 
-#if !defined(_MSC_VER)
+#if !defined(_MSC_VER) && !defined(DESKTOP_BUILD)
 //============================================================
 // Microsecond delay loop-
 void

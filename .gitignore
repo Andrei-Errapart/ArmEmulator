@@ -1,0 +1,23 @@
+# Object files
+*.o
+
+# Static libraries
+*.a
+
+# Executables
+test_emulator
+
+# macOS
+.DS_Store
+
+# Visual Studio
+*.user
+*.suo
+*.ncb
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+Debug/
+Release/
+x64/
